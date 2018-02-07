@@ -1,0 +1,146 @@
+var troops = [
+	"spear",
+	"sword",
+	"axe",
+	"spy",
+	"light",
+	"heavy",
+	"ram",
+	"catapult",
+	"knight",
+	"snob"
+];
+
+function Point(x, y)
+{
+	this.x = x;
+	this.y = y;
+}
+
+function Army(spear, sword, axe, spy, light, heavy, ram, catapult, knight, snob)
+{
+	this.spear = spear;
+	this.sword = sword;
+	this.axe = axe;
+	this.spy = spy;
+	this.light = light;
+	this.heavy = heavy;
+	this.ram = ram;
+	this.catapult = catapult;
+	this.knight = knight;
+	this.snob = snob;
+}
+
+function OrderRequest(village, army)
+{  
+	var name = $('#command-data-form > input[type="hidden"]:nth-child(1)').attr('name');
+	var value = $('#command-data-form > input[type="hidden"]:nth-child(1)').val();
+	this[name] = value;
+	this.template_id = "";
+	var source_village = $('#command-data-form > input[type="hidden"]:nth-child(3)').val();
+	this.spear = army.spear;
+	this.sword = army.sword;
+	this.axe = army.axe;
+	this.spy = army.spy;
+	this.light = army.light;
+	this.heavy = army.heavy;
+	this.ram = army.ram;
+	this.catapult = army.catapult;
+	this.knight = army.knight;
+	this.snob = army.snob;
+	this.x = village.x;
+	this.y = village.y;
+	this.target_type = "coord";
+	this.input = "";
+	this.attack = "Agriffe";
+}
+
+
+
+function VertifyRequest(village, army)
+{
+	this.attack = "true";
+	this.ch = $('#command-data-form > input[type="hidden"]:nth-child(3)').val();
+	this.x = village.x;
+	this.y = village.y;
+	this.source_village = $('#command-data-form > input[type="hidden"]:nth-child(7)').val();
+	this.spear = army.spear;
+	this.sword = army.sword;
+	this.axe = army.axe;
+	this.spy = army.spy;
+	this.light = army.light;
+	this.heavy = army.heavy;
+	this.ram = army.ram;
+	this.catapult = army.catapult;
+	this.knight = army.knight;
+	this.snob = army.snob;
+	this.building = "main";
+}
+
+function attack(village, army)
+{
+	function order(village, army)
+	{
+		$('body').load(
+			$('#command-data-form').attr('action'),
+			new OrderRequest(village, army),
+			vertify // Callback
+		);
+	}
+	function vertify()
+	{
+		$('body').load(
+			$('#command-data-form').attr('action'), 
+			new VertifyRequest(village, army)
+		);
+	}
+	order(village, army);
+}
+
+function init()
+{
+	$('#content_value > table.vis.modemenu').prepend('<div id="attack_timing"></div>');
+	update();
+}
+
+function timing_attack()
+{
+	var ct_spear = $('#unit_input_spear').val();
+	var ct_sword = $('#unit_input_sword').val();
+	var ct_axe = $('#unit_input_axe').val();
+	var ct_spy = $('#unit_input_spy').val();
+	var ct_light = $('#unit_input_light').val();
+	var ct_heavy = $('#unit_input_heavy').val();
+	var ct_ram = $('#unit_input_ram').val();
+	var ct_catapult = $('#unit_input_catapult').val();
+	var ct_knight = $('#unit_input_knight').val();
+	var ct_snob = $('#unit_input_snob').val();
+
+	var trg_x = $('#target_x').val();
+	var trg_y = $('#target_y').val();
+
+	attack(new Point(trg_x, trg_y), new Army(ct_spear, ct_sword, ct_axe, ct_spy, ct_light, ct_heavy, ct_ram, ct_catapult, ct_knight, ct_snob));
+}
+
+function update()
+{
+	var html = '';
+	html += 'Target X/Y <input type="text" id="target_x" size="3" value="464" ><input type="text" id="target_y" size="3" value="516" ><br />';
+	
+	for(var i=0; i<troops.length; i++)
+	{
+		html += '<img src="https://dsch.innogamescdn.com/8.112/35928/graphic/unit/unit_' + troops[i] + '.png"  title="' + troops[i] + '"  />';
+		html += '<input id="unit_input_' + troops[i] + '" name="' + troops[i] + '" type="text" tabindex="1" value="0" class="unitsInput" /><br />';
+	}	
+	
+	html += '<button class="btn" onclick="timing_attack()">timed attack</button>';
+	html += '<button class="btn" onclick="timing_support()">timed support</button>';
+	html += '<br />';
+
+	if($('#attack_timing').length == 0)
+	{
+		init();
+	}
+	$('#attack_timing').html(html);
+}
+init();
